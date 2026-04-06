@@ -26,12 +26,6 @@ python -m http.server 8080
 - 고객용: `http://localhost:8080/index.html`
 - 어드민: `http://localhost:8080/admin.html`
 
-## Admin Login
-
-- ID: `troiareuke`
-- Password: `!1qazxsw2@`
-
-주의: 현재 로그인 방식은 프론트엔드 기반의 간단한 접근 제한입니다. 공개 배포용 보안 인증으로는 충분하지 않습니다.
 
 ## GitHub Pages
 
