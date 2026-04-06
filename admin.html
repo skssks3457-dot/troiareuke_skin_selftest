@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>트로이아르케 진단 어드민</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+  <main class="admin-shell">
+    <section id="admin-login-view" class="login-shell">
+      <div class="login-card">
+        <img class="admin-logo login-logo" src="troiareuke-logo-white-text.png" alt="트로이아르케 로고">
+        <p class="admin-kicker login-kicker">Admin Access</p>
+        <h1 class="login-title">어드민 페이지 로그인</h1>
+        <p class="login-copy">관리자 계정으로 로그인한 후 고객 진단 응답을 확인할 수 있습니다.</p>
+
+        <div class="login-form">
+          <label class="filter-group">
+            <span>아이디</span>
+            <input id="admin-id-input" type="text" placeholder="관리자 아이디">
+          </label>
+
+          <label class="filter-group">
+            <span>비밀번호</span>
+            <input id="admin-password-input" type="password" placeholder="비밀번호">
+          </label>
+
+          <div class="login-options">
+            <label class="option-check">
+              <input id="remember-credentials" type="checkbox">
+              <span>아이디/비밀번호 저장</span>
+            </label>
+            <label class="option-check">
+              <input id="keep-login" type="checkbox">
+              <span>로그인 유지</span>
+            </label>
+          </div>
+
+          <p id="login-error" class="login-error"></p>
+          <button id="admin-login-button" class="primary-button" type="button">로그인</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="admin-dashboard-view" class="hidden">
+      <header class="admin-header">
+        <div class="admin-brand">
+          <img class="admin-logo" src="troiareuke-logo-white-text.png" alt="트로이아르케 로고">
+          <div>
+            <p class="admin-kicker">Admin Console</p>
+            <h1>피부 진단 응답 관리</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <a class="header-link" href="index.html">고객용 페이지 보기</a>
+          <button id="admin-logout-button" class="header-link header-button" type="button">로그아웃</button>
+        </div>
+      </header>
+
+      <section class="stats-grid" id="stats-grid"></section>
+      <section class="insight-grid">
+        <article class="insight-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Type Distribution</p>
+            <h2>피부 타입 분포</h2>
+          </div>
+          <div id="skin-type-breakdown" class="metric-list"></div>
+        </article>
+
+        <article class="insight-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Concern Distribution</p>
+            <h2>대표 고민 분포</h2>
+          </div>
+          <div id="concern-breakdown" class="metric-list"></div>
+        </article>
+
+        <article class="insight-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Zone Distribution</p>
+            <h2>부위별 고민 빈도</h2>
+          </div>
+          <div id="zone-breakdown" class="metric-list"></div>
+        </article>
+
+        <article class="insight-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Condition Breakdown</p>
+            <h2>세안 후 반응 / 피지 분포</h2>
+          </div>
+          <div class="mini-split">
+            <div>
+              <p class="mini-title">세안 후 반응</p>
+              <div id="cleanse-breakdown" class="metric-list compact"></div>
+            </div>
+            <div>
+              <p class="mini-title">피지 밸런스</p>
+              <div id="oil-breakdown" class="metric-list compact"></div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="admin-layout">
+        <aside class="filter-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Filters</p>
+            <h2>응답 필터</h2>
+          </div>
+
+          <label class="filter-group">
+            <span>이름 검색</span>
+            <input id="search-input" type="text" placeholder="고객 이름 검색">
+          </label>
+
+          <label class="filter-group">
+            <span>예상 피부 타입</span>
+            <select id="skin-type-filter">
+              <option value="">전체</option>
+            </select>
+          </label>
+
+          <label class="filter-group">
+            <span>대표 고민</span>
+            <select id="concern-filter">
+              <option value="">전체</option>
+            </select>
+          </label>
+
+          <button id="clear-filters" class="secondary-button" type="button">필터 초기화</button>
+          <button id="delete-all-records" class="danger-button" type="button">전체 응답 삭제</button>
+        </aside>
+
+        <section class="list-panel">
+          <div class="panel-head panel-head-row">
+            <div>
+              <p class="panel-kicker">Responses</p>
+              <h2>고객 응답 목록</h2>
+            </div>
+            <p id="result-count" class="result-count">0건</p>
+          </div>
+          <div id="response-list" class="response-list"></div>
+        </section>
+
+        <section class="detail-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Detail</p>
+            <h2>응답 상세</h2>
+          </div>
+          <div id="detail-view" class="detail-view empty-state">
+            좌측 목록에서 응답을 선택해 주세요.
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

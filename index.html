@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>트로이아르케 피부 진단 플로우</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="experience-card">
+      <aside class="brand-panel">
+        <img class="brand-logo" src="troiareuke-logo-white-text.png" alt="트로이아르케 영문 로고">
+        <h1>고객용 피부 진단 플로우</h1>
+        <p class="brand-description">
+          Deep change derma aesthetic<br>
+          과학적으로 피부를 분석하고, 맞춤 프로토콜을 설계하여
+          본질을 개선하는 피부 솔루션 브랜드
+        </p>
+
+        <div class="brand-badges">
+          <span>Expert Consultation</span>
+          <span>Precise Skin Diagnosis</span>
+          <span>Proper Prescription</span>
+        </div>
+      </aside>
+
+      <section class="survey-panel">
+        <section id="survey-view" class="survey-view">
+          <header class="survey-header">
+            <div class="progress-row">
+              <div>
+                <p class="section-label">Skin Profiling Flow</p>
+                <p id="step-label" class="step-label">01 / 05</p>
+              </div>
+              <p id="progress-label" class="progress-label">20%</p>
+            </div>
+
+            <div class="progress-track" aria-hidden="true">
+              <div id="progress-bar" class="progress-bar"></div>
+            </div>
+          </header>
+
+          <article class="question-card" aria-live="polite">
+            <div class="question-meta">
+              <p id="question-category" class="question-category"></p>
+              <div id="question-accent" class="question-accent"></div>
+            </div>
+
+            <h2 id="question-title" class="question-title"></h2>
+            <p id="question-description" class="question-description"></p>
+
+            <div id="question-helper" class="question-helper hidden"></div>
+            <div id="dynamic-field" class="dynamic-field"></div>
+          </article>
+
+          <p id="error-message" class="error-message" role="alert"></p>
+
+          <footer class="action-row">
+            <button id="prev-button" class="nav-button nav-button-secondary" type="button">이전</button>
+            <button id="next-button" class="nav-button nav-button-primary" type="button">다음</button>
+          </footer>
+        </section>
+
+        <section id="summary-view" class="summary-view hidden" aria-live="polite">
+          <header class="summary-header">
+            <p class="section-label">Skin Profile Result</p>
+            <h2>진단 요약 리포트</h2>
+            <p>
+              입력한 응답을 바탕으로 현재 피부의 민감도, 수분 밸런스,
+              루틴 성향을 한눈에 볼 수 있게 정리했습니다.
+            </p>
+          </header>
+
+          <section class="result-hero">
+            <div class="result-score">
+              <p class="result-score-label">예민도 지수</p>
+              <strong id="result-score-value">0</strong>
+              <span>/ 100</span>
+            </div>
+
+            <div class="result-copy">
+              <p id="result-headline" class="result-headline"></p>
+              <p id="result-summary" class="result-summary"></p>
+            </div>
+          </section>
+
+          <section class="summary-grid">
+            <article class="summary-panel">
+              <p class="summary-panel-label">응답 요약</p>
+              <div id="summary-list" class="summary-list"></div>
+            </article>
+
+            <article class="summary-panel">
+              <p class="summary-panel-label">추천 상담 방향</p>
+              <ul id="result-recommendations" class="recommendation-list"></ul>
+            </article>
+          </section>
+
+          <footer class="summary-actions">
+            <button id="restart-button" class="nav-button nav-button-secondary" type="button">다시 진단하기</button>
+            <button id="consult-button" class="nav-button nav-button-primary" type="button">상담 연결하기</button>
+          </footer>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <div id="consult-modal" class="modal-overlay hidden" aria-hidden="true">
+    <section class="consult-modal" role="dialog" aria-modal="true" aria-labelledby="consult-modal-title">
+      <div class="consult-modal-head">
+        <div>
+          <p class="section-label">Consult Handoff</p>
+          <h2 id="consult-modal-title">상담 전달용 요약</h2>
+        </div>
+        <button id="consult-close-button" class="modal-close" type="button" aria-label="닫기">×</button>
+      </div>
+
+      <p class="consult-modal-copy">
+        아래 내용을 복사한 뒤 카카오 상담으로 이동하면 상담 연결이 더 빠르고 정확해집니다.
+      </p>
+
+      <textarea id="consult-summary-text" class="consult-summary-text" readonly></textarea>
+
+      <p id="consult-copy-status" class="consult-copy-status"></p>
+
+      <div class="consult-actions">
+        <button id="consult-copy-button" class="nav-button nav-button-secondary" type="button">요약 복사하기</button>
+        <a id="consult-kakao-link" class="nav-button nav-button-primary summary-link-button" href="http://pf.kakao.com/_iZeJl/chat" target="_blank" rel="noopener noreferrer">카카오 상담 열기</a>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
