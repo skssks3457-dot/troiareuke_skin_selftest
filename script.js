@@ -142,7 +142,8 @@ const STORAGE_KEY = "TROIAREUKE_SKIN_DIAGNOSIS_RECORDS";
 const state = {
   currentIndex: 0,
   answers: {},
-  lastSavedId: null
+  lastSavedId: null,
+  faceZoneStep: 0
 };
 
 const surveyView = document.getElementById("survey-view");
@@ -196,19 +197,28 @@ function renderQuestion() {
   const question = questions[state.currentIndex];
   const progress = Math.round(((state.currentIndex + 1) / questions.length) * 100);
   const customerPrefix = getCustomerPrefix();
+  const isFaceMap = question.type === "faceMap";
+  const currentZone = isFaceMap ? question.zones[state.faceZoneStep] : null;
 
   stepLabel.textContent = `${String(state.currentIndex + 1).padStart(2, "0")} / ${String(questions.length).padStart(2, "0")}`;
   progressLabel.textContent = `${progress}%`;
   progressBar.style.width = `${progress}%`;
   questionCategory.textContent = question.category;
-  questionTitle.textContent = state.currentIndex === 0 ? question.title : `${customerPrefix}${question.title}`;
-  questionDescription.textContent = state.currentIndex === 0 ? question.description : `${customerPrefix}${question.description}`;
+  if (isFaceMap && currentZone) {
+    questionTitle.textContent = `${customerPrefix}${currentZone.label} 고민을 선택해 주세요.`;
+    questionDescription.textContent = `${customerPrefix}${currentZone.label} 부위에서 가장 가까운 항목을 1개 선택해 주세요. 특별한 고민이 없으면 '없음'을 선택해 주세요.`;
+  } else {
+    questionTitle.textContent = state.currentIndex === 0 ? question.title : `${customerPrefix}${question.title}`;
+    questionDescription.textContent = state.currentIndex === 0 ? question.description : `${customerPrefix}${question.description}`;
+  }
   questionHelper.classList.add("hidden");
   questionHelper.textContent = "";
   questionAccent.style.opacity = String(0.55 + state.currentIndex * 0.08);
   errorMessage.textContent = "";
-  prevButton.disabled = state.currentIndex === 0;
-  nextButton.textContent = state.currentIndex === questions.length - 1 ? "결과 보기" : "다음";
+  prevButton.disabled = state.currentIndex === 0 && (!isFaceMap || state.faceZoneStep === 0);
+  nextButton.textContent = isFaceMap
+    ? (state.faceZoneStep === question.zones.length - 1 ? "다음" : "다음 부위")
+    : (state.currentIndex === questions.length - 1 ? "결과 보기" : "다음");
 
   dynamicField.innerHTML = "";
 
@@ -608,28 +618,31 @@ function renderFaceMap(question) {
   const wrapper = document.createElement("div");
   wrapper.className = "zone-layout";
 
-  const selectedAnswers = Array.isArray(state.answers[question.id]) ? state.answers[question.id] : [];
-  const activeZoneValue = state.answers[`${question.id}ActiveZone`] || "";
+  const selectedAnswers = state.answers[question.id] && !Array.isArray(state.answers[question.id])
+    ? state.answers[question.id]
+    : {};
+  const currentZone = question.zones[state.faceZoneStep];
 
   const zoneGrid = document.createElement("div");
   zoneGrid.className = "zone-grid";
 
-  question.zones.forEach((zone) => {
+  question.zones.forEach((zone, index) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "zone-button";
 
-    if (activeZoneValue === zone.value) {
+    if (index === state.faceZoneStep) {
       button.classList.add("is-selected");
     }
 
+    const selected = selectedAnswers[zone.value];
     button.innerHTML = `
       <span class="zone-name">${zone.label}</span>
-      <span class="zone-copy">${zone.description}</span>
+      <span class="zone-copy">${selected ? selected.concernLabel : zone.description}</span>
     `;
 
     button.addEventListener("click", () => {
-      state.answers[`${question.id}ActiveZone`] = zone.value;
+      state.faceZoneStep = index;
       renderQuestion();
     });
 
@@ -637,73 +650,47 @@ function renderFaceMap(question) {
   });
 
   wrapper.appendChild(zoneGrid);
+  questionHelper.textContent = `${getCustomerPrefix()}부위별 피부 고민 ${state.faceZoneStep + 1} / ${question.zones.length}`;
+  questionHelper.classList.remove("hidden");
 
-  if (selectedAnswers.length) {
-    const selectedList = document.createElement("div");
-    selectedList.className = "concern-list";
-    selectedList.innerHTML = selectedAnswers.map((item) => `
-      <button type="button" class="concern-button is-selected" data-remove-zone="${item.zone}" data-remove-concern="${item.concern}">
-        <span class="concern-title">${item.zoneLabel} - ${item.concernLabel}</span>
-        <span class="concern-description">선택된 고민입니다. 다시 누르면 제거됩니다.</span>
-      </button>
-    `).join("");
+  const concernList = document.createElement("div");
+  concernList.className = "concern-list";
+  const concerns = [
+    { value: "none", label: "없음", description: `${currentZone.label} 부위에는 현재 특별한 고민이 없어요.` },
+    ...currentZone.concerns
+  ];
 
-    selectedList.querySelectorAll("[data-remove-zone]").forEach((button) => {
-      button.addEventListener("click", () => {
-        const zone = button.getAttribute("data-remove-zone");
-        const concern = button.getAttribute("data-remove-concern");
-        state.answers[question.id] = selectedAnswers.filter((item) => !(item.zone === zone && item.concern === concern));
-        renderQuestion();
-      });
+  concerns.forEach((concern) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "concern-button";
+
+    if (selectedAnswers[currentZone.value]?.concern === concern.value) {
+      button.classList.add("is-selected");
+    }
+
+    button.innerHTML = `
+      <span class="concern-title">${concern.label}</span>
+      <span class="concern-description">${concern.description}</span>
+    `;
+
+    button.addEventListener("click", () => {
+      state.answers[question.id] = {
+        ...selectedAnswers,
+        [currentZone.value]: {
+          zone: currentZone.value,
+          concern: concern.value,
+          zoneLabel: currentZone.label,
+          concernLabel: concern.label
+        }
+      };
+      renderQuestion();
     });
 
-    wrapper.appendChild(selectedList);
-  }
+    concernList.appendChild(button);
+  });
 
-  if (activeZoneValue) {
-    const activeZone = question.zones.find((zone) => zone.value === activeZoneValue);
-
-    questionHelper.textContent = `${getCustomerPrefix()}${activeZone.label} 부위에서 해당하는 피부 고민을 모두 선택해 주세요.`;
-    questionHelper.classList.remove("hidden");
-
-    const concernList = document.createElement("div");
-    concernList.className = "concern-list";
-
-    activeZone.concerns.forEach((concern) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "concern-button";
-      const isSelected = selectedAnswers.some((item) => item.zone === activeZone.value && item.concern === concern.value);
-      if (isSelected) {
-        button.classList.add("is-selected");
-      }
-
-      button.innerHTML = `
-        <span class="concern-title">${concern.label}</span>
-        <span class="concern-description">${concern.description}</span>
-      `;
-
-      button.addEventListener("click", () => {
-        const exists = selectedAnswers.some((item) => item.zone === activeZone.value && item.concern === concern.value);
-        state.answers[question.id] = exists
-          ? selectedAnswers.filter((item) => !(item.zone === activeZone.value && item.concern === concern.value))
-          : [
-              ...selectedAnswers,
-              {
-                zone: activeZone.value,
-                concern: concern.value,
-                zoneLabel: activeZone.label,
-                concernLabel: concern.label
-              }
-            ];
-        renderQuestion();
-      });
-
-      concernList.appendChild(button);
-    });
-
-    wrapper.appendChild(concernList);
-  }
+  wrapper.appendChild(concernList);
 
   dynamicField.appendChild(wrapper);
 }
@@ -865,7 +852,8 @@ function validateCurrentStep() {
   let hasAnswer = answer !== undefined && answer !== null && answer !== "";
 
   if (question.type === "faceMap") {
-    hasAnswer = Array.isArray(answer) && answer.length > 0;
+    const currentZone = question.zones[state.faceZoneStep];
+    hasAnswer = Boolean(answer && answer[currentZone.value] && answer[currentZone.value].concern);
   }
 
   if (question.multiSelect) {
@@ -899,6 +887,13 @@ function goToNext() {
     return;
   }
 
+  const question = questions[state.currentIndex];
+  if (question.type === "faceMap" && state.faceZoneStep < question.zones.length - 1) {
+    state.faceZoneStep += 1;
+    renderQuestion();
+    return;
+  }
+
   if (state.currentIndex === questions.length - 1) {
     renderSummary();
     return;
@@ -909,6 +904,13 @@ function goToNext() {
 }
 
 function goToPrevious() {
+  const question = questions[state.currentIndex];
+  if (question.type === "faceMap" && state.faceZoneStep > 0) {
+    state.faceZoneStep -= 1;
+    renderQuestion();
+    return;
+  }
+
   if (state.currentIndex === 0) {
     return;
   }
@@ -923,10 +925,13 @@ function getOptionLabel(question, value) {
   }
 
   if (question.type === "faceMap") {
-    if (!Array.isArray(value) || !value.length) {
+    if (!value || Array.isArray(value)) {
       return "-";
     }
-    return value.map((item) => `${item.zoneLabel} - ${item.concernLabel}`).join(", ");
+    return question.zones.map((zone) => {
+      const selected = value[zone.value];
+      return `${zone.label} - ${selected ? selected.concernLabel : "미응답"}`;
+    }).join(", ");
   }
 
   if (question.type === "infoForm") {
@@ -1134,6 +1139,7 @@ function resetSurvey() {
   state.currentIndex = 0;
   state.answers = {};
   state.lastSavedId = null;
+  state.faceZoneStep = 0;
   summaryView.classList.add("hidden");
   surveyView.classList.remove("hidden");
   renderQuestion();

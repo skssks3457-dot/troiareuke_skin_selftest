@@ -1,15 +1,12 @@
 # TROIAREUKE Skin Diagnosis Web
 
-트로이아르케 고객용 피부 진단 페이지와 어드민 확인 페이지입니다.
+트로이아르케 고객용 피부 진단 페이지입니다.
 
-## Files
+## Public Files
 
 - `index.html`: 고객용 진단 페이지
 - `style.css`: 고객용 스타일
 - `script.js`: 고객용 인터랙션 및 결과 저장
-- `admin.html`: 어드민 로그인/대시보드 페이지
-- `admin-style.css`: 어드민 스타일
-- `admin.js`: 어드민 로그인, 응답 조회, 통계, 삭제 기능
 
 ## Local Run
 
@@ -24,8 +21,6 @@ python -m http.server 8080
 그 다음 브라우저에서 아래 주소를 엽니다.
 
 - 고객용: `http://localhost:8080/index.html`
-- 어드민: `http://localhost:8080/admin.html`
-
 
 ## GitHub Pages
 
@@ -38,9 +33,11 @@ python -m http.server 8080
 5. 브랜치 `main`과 폴더 `/root` 선택
 6. 저장 후 배포 URL 확인
 
-## Data Storage
+## Local Admin
 
-고객 진단 결과는 현재 브라우저 `localStorage`에 저장됩니다.
+어드민 파일은 공개 배포 저장소에서 제외하고, 로컬 전용으로 분리해서 사용하는 것을 권장합니다.
 
-- 같은 브라우저/기기에서는 어드민 페이지에서 바로 확인 가능
-- 다른 팀원과 데이터를 공유하려면 추후 백엔드 또는 외부 DB 연동이 필요
+주의:
+
+- 현재 고객 진단 결과는 브라우저 `localStorage`에 저장됩니다.
+- 따라서 실제 운영 환경에서 다른 고객의 응답을 어드민에서 보려면 추후 백엔드 또는 외부 DB 연동이 필요합니다.
