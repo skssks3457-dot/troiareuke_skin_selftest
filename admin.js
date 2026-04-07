@@ -1,4 +1,4 @@
-﻿const STORAGE_KEY = "TROIAREUKE_SKIN_DIAGNOSIS_RECORDS";
+const STORAGE_KEY = "TROIAREUKE_SKIN_DIAGNOSIS_RECORDS";
 const ADMIN_AUTH_KEY = "TROIAREUKE_ADMIN_AUTH";
 const ADMIN_PERSIST_AUTH_KEY = "TROIAREUKE_ADMIN_AUTH_PERSIST";
 const ADMIN_SAVED_CREDENTIALS_KEY = "TROIAREUKE_ADMIN_SAVED_CREDENTIALS";
@@ -83,7 +83,7 @@ function handleLogin() {
     return;
   }
 
-  loginError.textContent = "?꾩씠???먮뒗 鍮꾨?踰덊샇媛 ?щ컮瑜댁? ?딆뒿?덈떎.";
+  loginError.textContent = "아이디 또는 비밀번호가 올바르지 않습니다.";
 }
 
 function handleLogout() {
@@ -146,7 +146,7 @@ function renderMetricList(container, map) {
   const total = entries.reduce((sum, [, count]) => sum + count, 0);
 
   if (!entries.length) {
-    container.innerHTML = '<p class="detail-text">?꾩쭅 吏묎퀎???곗씠?곌? ?놁뒿?덈떎.</p>';
+    container.innerHTML = '<p class="detail-text">아직 집계할 데이터가 없습니다.</p>';
     return;
   }
 
@@ -156,7 +156,7 @@ function renderMetricList(container, map) {
       <div class="metric-row">
         <div class="metric-head">
           <span class="metric-name">${name}</span>
-          <span class="metric-value">${count}嫄?쨌 ${percent}%</span>
+          <span class="metric-value">${count}건 · ${percent}%</span>
         </div>
         <div class="metric-bar">
           <div class="metric-fill" style="width: ${percent}%;"></div>
@@ -170,10 +170,10 @@ function renderFilterOptions() {
   const skinTypes = getUniqueValues((record) => record.profile?.skinType);
   const concerns = getUniqueValues((record) => record.profile?.mainConcern);
 
-  skinTypeFilter.innerHTML = '<option value="">?꾩껜</option>' +
+  skinTypeFilter.innerHTML = '<option value="">전체</option>' +
     skinTypes.map((item) => `<option value="${item}">${item}</option>`).join("");
 
-  concernFilter.innerHTML = '<option value="">?꾩껜</option>' +
+  concernFilter.innerHTML = '<option value="">전체</option>' +
     concerns.map((item) => `<option value="${item}">${item}</option>`).join("");
 }
 
@@ -184,13 +184,13 @@ function applyFilters() {
 
   adminState.filtered = adminState.records.filter((record) => {
     const searchTarget = [
-      record.id,
+      record.createdAtLabel,
       record.customer?.age,
       record.customer?.gender,
       record.customer?.note,
-      record.createdAtLabel,
       record.profile?.skinType,
-      record.profile?.mainConcern
+      record.profile?.mainConcern,
+      record.profile?.faceZone
     ].filter(Boolean).join(" ").toLowerCase();
     const nameMatch = !searchValue || searchTarget.includes(searchValue);
     const skinTypeMatch = !skinTypeValue || record.profile?.skinType === skinTypeValue;
@@ -206,8 +206,8 @@ function applyFilters() {
 function renderStats() {
   const total = adminState.records.length;
   const latest = adminState.records[0];
-  const sensitiveCount = adminState.records.filter((record) => (record.profile?.skinType || "").includes("誘쇨컧")).length;
-  const oilyCount = adminState.records.filter((record) => (record.profile?.skinType || "").includes("吏??)).length;
+  const sensitiveCount = adminState.records.filter((record) => (record.profile?.skinType || "").includes("민감")).length;
+  const oilyCount = adminState.records.filter((record) => (record.profile?.skinType || "").includes("지성")).length;
   const averageSensitivity = total
     ? (adminState.records.reduce((sum, record) => sum + Number(record.profile?.sensitivity || 0), 0) / total).toFixed(1)
     : "0.0";
@@ -217,22 +217,22 @@ function renderStats() {
 
   statsGrid.innerHTML = `
     <article class="stat-card">
-      <p class="stat-label">珥??묐떟 ??/p>
+      <p class="stat-label">총 응답 수</p>
       <p class="stat-value">${total}</p>
-      <p class="stat-sub">?꾩쟻 ??λ맂 吏꾨떒 寃곌낵</p>
+      <p class="stat-sub">누적 저장된 진단 결과</p>
     </article>
     <article class="stat-card">
-      <p class="stat-label">誘쇨컧???묐떟</p>
+      <p class="stat-label">민감성 응답</p>
       <p class="stat-value">${sensitiveCount}</p>
-      <p class="stat-sub">誘쇨컧 ?ㅼ썙???ы븿 ???湲곗?</p>
+      <p class="stat-sub">민감 키워드 포함 타입 기준</p>
     </article>
     <article class="stat-card">
-      <p class="stat-label">吏???묐떟</p>
+      <p class="stat-label">지성 응답</p>
       <p class="stat-value">${oilyCount}</p>
-      <p class="stat-sub">吏???ㅼ썙???ы븿 ???湲곗?</p>
+      <p class="stat-sub">지성 키워드 포함 타입 기준</p>
     </article>
     <article class="stat-card">
-      <p class="stat-label">?됯퇏 誘쇨컧??/ 怨좉컼 ??/p>
+      <p class="stat-label">평균 민감도 / 고객 수</p>
       <p class="stat-value">${averageSensitivity}</p>
       <p class="stat-sub">고유 응답 ${uniqueCustomers}건 · 최근 ${latest ? latest.createdAtLabel : "-"}</p>
     </article>
@@ -242,10 +242,10 @@ function renderStats() {
   const concernMap = countBy(adminState.records.map((record) => record.profile?.mainConcern));
   const zoneMap = countFlatBy(adminState.records, (record) => {
     const value = record.answers?.faceZoneConcern;
-    if (!value || Array.isArray(value)) {
+    if (!Array.isArray(value)) {
       return [];
     }
-    return Object.values(value).map((item) => item.zoneLabel);
+    return value.map((item) => item.zoneLabel);
   });
   const cleanseMap = countFlatBy(adminState.records, (record) => {
     const values = record.answers?.postCleanseFeel;
@@ -253,10 +253,10 @@ function renderStats() {
       return [];
     }
     const labels = {
-      tight: "留롮씠 ?밴?",
-      innerDry: "?띻굔議?,
-      redness: "遺됱쓬",
-      mixedZone: "遺?꾨퀎 ?ㅻ쫫"
+      tight: "많이 당김",
+      innerDry: "속건조",
+      redness: "붉음",
+      mixedZone: "부위별 다름"
     };
     return values.map((value) => labels[value] || value);
   });
@@ -270,10 +270,10 @@ function renderStats() {
 }
 
 function renderList() {
-  resultCount.textContent = `${adminState.filtered.length}嫄?;
+  resultCount.textContent = `${adminState.filtered.length}건`;
 
   if (!adminState.filtered.length) {
-    responseList.innerHTML = '<div class="detail-view empty-state">議곌굔??留욌뒗 ?묐떟???놁뒿?덈떎.</div>';
+    responseList.innerHTML = '<div class="detail-view empty-state">조건에 맞는 응답이 없습니다.</div>';
     return;
   }
 
@@ -281,9 +281,9 @@ function renderList() {
     <button class="response-card ${record.id === adminState.selectedId ? "is-active" : ""}" type="button" data-record-id="${record.id}">
       <div class="response-card-head">
         <p class="response-name">응답 ${record.createdAtLabel}</p>
-        <button class="card-danger-button" type="button" data-delete-id="${record.id}">??젣</button>
+        <button class="card-danger-button" type="button" data-delete-id="${record.id}">삭제</button>
       </div>
-      <p class="response-meta">${record.customer.age || "-"}??/ ${getGenderLabel(record.customer.gender)} / ${record.createdAtLabel}</p>
+      <p class="response-meta">${record.customer.age || "-"}세 / ${getGenderLabel(record.customer.gender)} / ${record.createdAtLabel}</p>
       <div class="response-tag-row">
         <span class="response-tag">${record.profile.skinType}</span>
         <span class="response-tag">${record.profile.mainConcern}</span>
@@ -310,10 +310,10 @@ function renderList() {
 
 function getGenderLabel(gender) {
   if (gender === "female") {
-    return "?ъ꽦";
+    return "여성";
   }
   if (gender === "male") {
-    return "?⑥꽦";
+    return "남성";
   }
   return "-";
 }
@@ -323,7 +323,7 @@ function renderDetail() {
 
   if (!record) {
     detailView.className = "detail-view empty-state";
-    detailView.textContent = "醫뚯륫 紐⑸줉?먯꽌 ?묐떟???좏깮??二쇱꽭??";
+    detailView.textContent = "좌측 목록에서 응답을 선택해 주세요.";
     return;
   }
 
@@ -332,31 +332,31 @@ function renderDetail() {
     <div class="detail-block">
       <div class="detail-block-head">
         <h3>고객 기본 정보</h3>
-        <button class="card-danger-button" type="button" id="delete-selected-record">??젣</button>
+        <button class="card-danger-button" type="button" id="delete-selected-record">삭제</button>
       </div>
-      <p class="detail-meta">${record.customer.age || "-"}??/ ${getGenderLabel(record.customer.gender)} / ${record.createdAtLabel}</p>
-      <p class="detail-text">${record.customer.note || "?뱀씠?ы빆 ?놁쓬"}</p>
+      <p class="detail-meta">${record.customer.age || "-"}세 / ${getGenderLabel(record.customer.gender)} / ${record.createdAtLabel}</p>
+      <p class="detail-text">${record.customer.note || "특이사항 없음"}</p>
       <div class="detail-chip-row">
         <span class="detail-chip">${record.profile.skinType}</span>
-        <span class="detail-chip">誘쇨컧??${record.profile.sensitivity}/10</span>
+        <span class="detail-chip">민감도 ${record.profile.sensitivity}/10</span>
         <span class="detail-chip">${record.profile.mainConcern}</span>
       </div>
     </div>
     <div class="detail-block">
-      <h3>吏꾨떒 寃곌낵</h3>
-      <p class="detail-meta">?덈???吏??${record.result.score} / 100</p>
+      <h3>진단 결과</h3>
+      <p class="detail-meta">예민도 지수 ${record.result.score} / 100</p>
       <p class="answer-value">${record.result.headline}</p>
       <p class="detail-text">${record.result.summary}</p>
     </div>
     <div class="detail-block">
-      <h3>遺??諛??쇱? ?뺣낫</h3>
+      <h3>부위 및 피지 정보</h3>
       <div class="detail-chip-row">
         <span class="detail-chip">${record.profile.faceZone}</span>
         <span class="detail-chip">${record.profile.oilBalance}</span>
       </div>
     </div>
     <div class="detail-block">
-      <h3>?묐떟 ?곸꽭</h3>
+      <h3>응답 상세</h3>
       <div class="answer-list">
         ${record.answerSummary.map((item) => `
           <article class="answer-item">
@@ -395,11 +395,11 @@ function deleteRecord(recordId) {
 
 function deleteAllRecords() {
   if (!adminState.records.length) {
-    window.alert("??젣???묐떟???놁뒿?덈떎.");
+    window.alert("삭제할 응답이 없습니다.");
     return;
   }
 
-  const shouldDelete = window.confirm("??λ맂 紐⑤뱺 怨좉컼 ?묐떟????젣?좉퉴?? ???묒뾽? ?섎룎由????놁뒿?덈떎.");
+  const shouldDelete = window.confirm("저장된 모든 고객 응답을 삭제할까요? 이 작업은 되돌릴 수 없습니다.");
   if (!shouldDelete) {
     return;
   }
@@ -476,4 +476,3 @@ function init() {
 }
 
 init();
-
