@@ -49,7 +49,6 @@ const questions = [
     title: "얼굴에서 신경 쓰이는 부위를 선택해 고민을 골라주세요.",
     description: "부위를 먼저 고른 뒤, 해당 부위에서 가장 크게 느끼는 고민을 이어서 선택해 주세요.",
     type: "faceMap",
-    multiSelect: true,
     zones: [
       {
         value: "forehead",
@@ -870,9 +869,7 @@ function validateCurrentStep() {
   if (question.type === "faceMap") {
     const currentZone = question.zones[state.faceZoneStep];
     hasAnswer = Boolean(answer && answer[currentZone.value] && answer[currentZone.value].concern);
-  }
-
-  if (question.multiSelect) {
+  } else if (question.multiSelect) {
     hasAnswer = Array.isArray(answer) && answer.length > 0;
   }
 
