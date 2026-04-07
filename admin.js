@@ -185,6 +185,8 @@ function applyFilters() {
   adminState.filtered = adminState.records.filter((record) => {
     const searchTarget = [
       record.createdAtLabel,
+      record.customer?.nickname,
+      record.customer?.name,
       record.customer?.age,
       record.customer?.gender,
       record.customer?.note,
@@ -234,7 +236,7 @@ function renderStats() {
     <article class="stat-card">
       <p class="stat-label">평균 민감도 / 고객 수</p>
       <p class="stat-value">${averageSensitivity}</p>
-      <p class="stat-sub">고유 응답 ${uniqueCustomers}건 · 최근 ${latest ? latest.createdAtLabel : "-"}</p>
+      <p class="stat-sub">고유 응답 ${uniqueCustomers}건 · 최근 ${latest ? (latest.customer?.nickname || latest.createdAtLabel) : "-"}</p>
     </article>
   `;
 
@@ -280,7 +282,7 @@ function renderList() {
   responseList.innerHTML = adminState.filtered.map((record) => `
     <button class="response-card ${record.id === adminState.selectedId ? "is-active" : ""}" type="button" data-record-id="${record.id}">
       <div class="response-card-head">
-        <p class="response-name">응답 ${record.createdAtLabel}</p>
+        <p class="response-name">${record.customer?.nickname || `응답 ${record.createdAtLabel}`}</p>
         <button class="card-danger-button" type="button" data-delete-id="${record.id}">삭제</button>
       </div>
       <p class="response-meta">${record.customer.age || "-"}세 / ${getGenderLabel(record.customer.gender)} / ${record.createdAtLabel}</p>
@@ -331,7 +333,7 @@ function renderDetail() {
   detailView.innerHTML = `
     <div class="detail-block">
       <div class="detail-block-head">
-        <h3>고객 기본 정보</h3>
+        <h3>${record.customer?.nickname || "고객"} 기본 정보</h3>
         <button class="card-danger-button" type="button" id="delete-selected-record">삭제</button>
       </div>
       <p class="detail-meta">${record.customer.age || "-"}세 / ${getGenderLabel(record.customer.gender)} / ${record.createdAtLabel}</p>
@@ -380,7 +382,7 @@ function deleteRecord(recordId) {
     return;
   }
 
-  const shouldDelete = window.confirm(`선택한 응답을 삭제할까요? 이 작업은 되돌릴 수 없습니다.`);
+  const shouldDelete = window.confirm(`${record.customer?.nickname || "선택한 응답"}을 삭제할까요? 이 작업은 되돌릴 수 없습니다.`);
   if (!shouldDelete) {
     return;
   }

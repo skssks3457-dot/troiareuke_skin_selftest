@@ -173,8 +173,35 @@ const consultSummaryText = document.getElementById("consult-summary-text");
 const consultCopyButton = document.getElementById("consult-copy-button");
 const consultCopyStatus = document.getElementById("consult-copy-status");
 
+const nicknameParts = {
+  month: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+  fruit: ["사과", "복숭아", "자두", "포도", "레몬", "체리", "멜론", "유자"],
+  animal: ["고양이", "토끼", "여우", "다람쥐", "사슴", "강아지", "판다", "참새"],
+  vegetable: ["당근", "브로콜리", "양배추", "오이", "버섯", "토마토", "무", "고구마"]
+};
+
+function getSeededIndex(seed, length, offset = 0) {
+  const value = Math.abs(seed * (offset + 3) + offset * 17);
+  return value % length;
+}
+
+function generateAutoNickname() {
+  const customer = state.answers.customerInfo || {};
+  const ageSeed = Number(customer.age || 0);
+  const genderSeed = customer.gender === "female" ? 7 : customer.gender === "male" ? 13 : 3;
+  const monthSeed = new Date().getMonth() + 1;
+  const baseSeed = ageSeed + genderSeed + monthSeed + Date.now();
+
+  const month = nicknameParts.month[getSeededIndex(baseSeed, nicknameParts.month.length, 1)];
+  const fruit = nicknameParts.fruit[getSeededIndex(baseSeed, nicknameParts.fruit.length, 2)];
+  const animal = nicknameParts.animal[getSeededIndex(baseSeed, nicknameParts.animal.length, 3)];
+  const vegetable = nicknameParts.vegetable[getSeededIndex(baseSeed, nicknameParts.vegetable.length, 4)];
+
+  return `${month} ${fruit} ${animal} ${vegetable}`;
+}
+
 function getCustomerName() {
-  return "";
+  return state.answers.customerInfo?.nickname || "";
 }
 
 function getCustomerPrefix() {
@@ -876,6 +903,12 @@ function goToNext() {
   }
 
   const question = questions[state.currentIndex];
+  if (question.id === "customerInfo" && !state.answers.customerInfo?.nickname) {
+    state.answers.customerInfo = {
+      ...state.answers.customerInfo,
+      nickname: generateAutoNickname()
+    };
+  }
   if (question.type === "faceMap" && state.faceZoneStep < question.zones.length - 1) {
     state.faceZoneStep += 1;
     renderQuestion();
@@ -965,7 +998,8 @@ function buildSurveyRecord() {
     createdAt: now,
     createdAtLabel: getTimestampLabel(now),
     customer: {
-      name: "",
+      name: state.answers.customerInfo?.nickname || "",
+      nickname: state.answers.customerInfo?.nickname || "",
       age: state.answers.customerInfo?.age || "",
       gender: state.answers.customerInfo?.gender || "",
       note: state.answers.customerInfo?.note?.trim() || ""
@@ -1021,6 +1055,7 @@ function buildConsultSummaryText() {
 
   return [
     "[트로이아르케 피부 진단 요약]",
+    `닉네임: ${customer.nickname || customer.name || "-"}`,
     `나이/성별: ${customer.age || "-"}세 / ${genderLabel}`,
     `예상 피부 타입: ${profile.typeLabel}`,
     `민감도: ${state.answers.sensitivityLevel ?? 0}/10`,
