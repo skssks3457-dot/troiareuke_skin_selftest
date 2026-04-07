@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>?몃줈?댁븘瑜댁? 吏꾨떒 ?대뱶誘?/title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+  <main class="admin-shell">
+    <section id="admin-login-view" class="login-shell">
+      <div class="login-card">
+        <img class="admin-logo login-logo" src="troiareuke-logo-white-text.png" alt="?몃줈?댁븘瑜댁? 濡쒓퀬">
+        <p class="admin-kicker login-kicker">Admin Access</p>
+        <h1 class="login-title">?대뱶誘??섏씠吏 濡쒓렇??/h1>
+        <p class="login-copy">愿由ъ옄 怨꾩젙?쇰줈 濡쒓렇?명븳 ??怨좉컼 吏꾨떒 ?묐떟???뺤씤?????덉뒿?덈떎.</p>
+
+        <div class="login-form">
+          <label class="filter-group">
+            <span>?꾩씠??/span>
+            <input id="admin-id-input" type="text" placeholder="愿由ъ옄 ?꾩씠??>
+          </label>
+
+          <label class="filter-group">
+            <span>鍮꾨?踰덊샇</span>
+            <input id="admin-password-input" type="password" placeholder="鍮꾨?踰덊샇">
+          </label>
+
+          <div class="login-options">
+            <label class="option-check">
+              <input id="remember-credentials" type="checkbox">
+              <span>?꾩씠??鍮꾨?踰덊샇 ???/span>
+            </label>
+            <label class="option-check">
+              <input id="keep-login" type="checkbox">
+              <span>濡쒓렇???좎?</span>
+            </label>
+          </div>
+
+          <p id="login-error" class="login-error"></p>
+          <button id="admin-login-button" class="primary-button" type="button">濡쒓렇??/button>
+        </div>
+      </div>
+    </section>
+
+    <section id="admin-dashboard-view" class="hidden">
+      <header class="admin-header">
+        <div class="admin-brand">
+          <img class="admin-logo" src="troiareuke-logo-white-text.png" alt="?몃줈?댁븘瑜댁? 濡쒓퀬">
+          <div>
+            <p class="admin-kicker">Admin Console</p>
+            <h1>?쇰? 吏꾨떒 ?묐떟 愿由?/h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <a class="header-link" href="index.html">怨좉컼???섏씠吏 蹂닿린</a>
+          <button id="admin-logout-button" class="header-link header-button" type="button">濡쒓렇?꾩썐</button>
+        </div>
+      </header>
+
+      <section class="stats-grid" id="stats-grid"></section>
+      <section class="insight-grid">
+        <article class="insight-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Type Distribution</p>
+            <h2>?쇰? ???遺꾪룷</h2>
+          </div>
+          <div id="skin-type-breakdown" class="metric-list"></div>
+        </article>
+
+        <article class="insight-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Concern Distribution</p>
+            <h2>???怨좊? 遺꾪룷</h2>
+          </div>
+          <div id="concern-breakdown" class="metric-list"></div>
+        </article>
+
+        <article class="insight-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Zone Distribution</p>
+            <h2>遺?꾨퀎 怨좊? 鍮덈룄</h2>
+          </div>
+          <div id="zone-breakdown" class="metric-list"></div>
+        </article>
+
+        <article class="insight-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Condition Breakdown</p>
+            <h2>?몄븞 ??諛섏쓳 / ?쇱? 遺꾪룷</h2>
+          </div>
+          <div class="mini-split">
+            <div>
+              <p class="mini-title">?몄븞 ??諛섏쓳</p>
+              <div id="cleanse-breakdown" class="metric-list compact"></div>
+            </div>
+            <div>
+              <p class="mini-title">?쇱? 諛몃윴??/p>
+              <div id="oil-breakdown" class="metric-list compact"></div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="admin-layout">
+        <aside class="filter-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Filters</p>
+            <h2>?묐떟 ?꾪꽣</h2>
+          </div>
+
+          <label class="filter-group">
+            <span>응답 검색</span>
+            <input id="search-input" type="text" placeholder="나이, 성별, 특이사항, 피부타입 검색">
+          </label>
+
+          <label class="filter-group">
+            <span>?덉긽 ?쇰? ???/span>
+            <select id="skin-type-filter">
+              <option value="">?꾩껜</option>
+            </select>
+          </label>
+
+          <label class="filter-group">
+            <span>???怨좊?</span>
+            <select id="concern-filter">
+              <option value="">?꾩껜</option>
+            </select>
+          </label>
+
+          <button id="clear-filters" class="secondary-button" type="button">?꾪꽣 珥덇린??/button>
+          <button id="delete-all-records" class="danger-button" type="button">?꾩껜 ?묐떟 ??젣</button>
+        </aside>
+
+        <section class="list-panel">
+          <div class="panel-head panel-head-row">
+            <div>
+              <p class="panel-kicker">Responses</p>
+              <h2>怨좉컼 ?묐떟 紐⑸줉</h2>
+            </div>
+            <p id="result-count" class="result-count">0嫄?/p>
+          </div>
+          <div id="response-list" class="response-list"></div>
+        </section>
+
+        <section class="detail-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Detail</p>
+            <h2>?묐떟 ?곸꽭</h2>
+          </div>
+          <div id="detail-view" class="detail-view empty-state">
+            醫뚯륫 紐⑸줉?먯꽌 ?묐떟???좏깮??二쇱꽭??
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
+
+
