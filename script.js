@@ -204,7 +204,8 @@ function getCustomerName() {
 }
 
 function getCustomerPrefix() {
-  return "";
+  const nickname = getCustomerName();
+  return nickname ? `${nickname}님의 ` : "";
 }
 
 function getTimestampLabel(isoString) {
@@ -286,15 +287,31 @@ function renderQuestion() {
 
 function renderInfoForm() {
   const savedInfo = {
+    nickname: "",
     age: "",
     gender: "",
     note: "",
     ...(state.answers.customerInfo || {})
   };
 
+  if (!savedInfo.nickname) {
+    savedInfo.nickname = generateAutoNickname();
+    state.answers.customerInfo = {
+      ...state.answers.customerInfo,
+      nickname: savedInfo.nickname
+    };
+  }
+
   const form = document.createElement("div");
   form.className = "info-form";
   form.innerHTML = `
+    <div class="field-group">
+      <span class="field-label">랜덤 닉네임</span>
+      <div class="nickname-row">
+        <div id="customer-nickname" class="nickname-card">${savedInfo.nickname}</div>
+        <button id="nickname-refresh" class="nickname-refresh" type="button">다른 닉네임</button>
+      </div>
+    </div>
     <div class="field-row">
       <div class="field-group">
         <label class="field-label" for="customer-age">나이</label>
@@ -316,6 +333,8 @@ function renderInfoForm() {
 
   dynamicField.appendChild(form);
 
+  const nicknameCard = document.getElementById("customer-nickname");
+  const nicknameRefreshButton = document.getElementById("nickname-refresh");
   const ageInput = document.getElementById("customer-age");
   const noteInput = document.getElementById("customer-note");
   const femaleButton = document.getElementById("gender-female");
@@ -338,6 +357,11 @@ function renderInfoForm() {
     };
   };
 
+  nicknameRefreshButton.addEventListener("click", () => {
+    const nextNickname = generateAutoNickname();
+    nicknameCard.textContent = nextNickname;
+    persistInfo({ nickname: nextNickname });
+  });
   ageInput.addEventListener("input", (event) => {
     persistInfo({ age: event.target.value });
   });
