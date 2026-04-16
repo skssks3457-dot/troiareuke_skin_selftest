@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>트로이아르케 브랜드 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Brand Intelligence System</p>
+        <h1>트로이아르케 온라인·모바일 언급을 수집하고 액션으로 연결하는 대시보드</h1>
+        <p class="hero-text">
+          브랜드 언급량, 네이버·구글 검색량, 경쟁사 비교, 평판 이슈, 멘션 수집까지
+          하나의 운영 화면에서 보고 실행할 수 있게 구성했습니다.
+        </p>
+        <div class="hero-actions">
+          <button class="solid-button" type="button" data-scroll-target="#overview">핵심 지표 보기</button>
+          <button class="ghost-button" type="button" data-scroll-target="#mentions">멘션 피드 보기</button>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="brand-chip">
+          <img src="https://raw.githubusercontent.com/skssks3457-dot/troiareuke_skin_selftest/main/troiareuke-logo.png" alt="트로이아르케 로고">
+          <span>TROIAREUKE</span>
+        </div>
+        <div class="hero-metric-grid" id="heroMetricGrid"></div>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="toolbar">
+        <div class="toolbar-top">
+          <div class="toolbar-group">
+            <p class="toolbar-label">기간 설정</p>
+            <div class="date-controls">
+              <label class="date-field">
+                <span>시작일</span>
+                <input id="startDate" type="date">
+              </label>
+              <label class="date-field">
+                <span>종료일</span>
+                <input id="endDate" type="date">
+              </label>
+              <button id="applyDateButton" class="solid-button compact" type="button">기간 적용</button>
+            </div>
+          </div>
+
+          <div class="toolbar-group">
+            <p class="toolbar-label">데이터 모드</p>
+            <div class="chip-row" id="modeFilters"></div>
+          </div>
+        </div>
+
+        <div class="toolbar-bottom">
+          <div class="toolbar-group wide">
+            <p class="toolbar-label">모니터링 채널</p>
+            <div class="chip-row" id="channelFilters"></div>
+          </div>
+          <div class="toolbar-group compact-card">
+            <p class="toolbar-label">데이터 상태</p>
+            <div class="status-card">
+              <strong id="dataModeLabel">샘플 데이터 모드</strong>
+              <span id="dataStatusText">샘플 데이터로 화면 구조를 확인하는 중입니다.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel competitor-strip">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">Competitor Scope</p>
+            <h2>고정 경쟁사 비교 범위</h2>
+          </div>
+          <p class="panel-caption">달바, 닥터멜락신, 톰프로그램, 메디테라피, 파메스테틱 기준</p>
+        </div>
+        <div class="brand-pill-row" id="competitorPills"></div>
+      </section>
+
+      <section class="panel overview-panel" id="overview">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">Overview</p>
+            <h2>유입·전환·재구매 관점 핵심 요약</h2>
+          </div>
+          <p class="panel-caption" id="dateRangeLabel"></p>
+        </div>
+        <div class="stat-grid" id="statGrid"></div>
+      </section>
+
+      <section class="analytics-grid">
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-kicker">Trend</p>
+              <h2>멘션량, 네이버 검색량, 구글 검색량 추이</h2>
+            </div>
+            <p class="panel-caption">상승 파형을 먼저 보고 콘텐츠와 광고 타이밍을 결정</p>
+          </div>
+          <div class="chart-wrap">
+            <svg id="trendChart" class="trend-chart" viewBox="0 0 720 320" preserveAspectRatio="none" aria-label="트렌드 차트"></svg>
+          </div>
+          <div class="trend-legend">
+            <span><i class="legend-swatch total"></i>총 멘션</span>
+            <span><i class="legend-swatch naver"></i>네이버 검색량</span>
+            <span><i class="legend-swatch google"></i>구글 검색량</span>
+          </div>
+        </article>
+
+        <article class="panel score-panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-kicker">Search Pulse</p>
+              <h2>검색 관심도 요약</h2>
+            </div>
+            <p class="panel-caption">채널별 검색량은 실시간 연동용 슬롯으로 설계</p>
+          </div>
+          <div class="search-grid" id="searchGrid"></div>
+          <div class="sentiment-bars" id="sentimentBars"></div>
+        </article>
+      </section>
+
+      <section class="insight-grid">
+        <article class="panel keyword-panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-kicker">Keywords</p>
+              <h2>상승 키워드와 이슈 태그</h2>
+            </div>
+            <p class="panel-caption">후킹, FAQ, 광고 카피로 바로 전환할 수 있는 키워드</p>
+          </div>
+          <div class="keyword-cloud" id="keywordCloud"></div>
+        </article>
+
+        <article class="panel competitor-panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-kicker">Competitors</p>
+              <h2>경쟁사 비교</h2>
+            </div>
+            <p class="panel-caption">점유 멘션, 긍정률, 검색 모멘텀 기준 비교</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>브랜드</th>
+                  <th>점유 멘션</th>
+                  <th>긍정률</th>
+                  <th>검색 모멘텀</th>
+                </tr>
+              </thead>
+              <tbody id="competitorTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel action-panel">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">Action Board</p>
+            <h2>평판 관리 및 운영 액션</h2>
+          </div>
+          <p class="panel-caption">리서치를 즉시 매출 연결 작업으로 전환</p>
+        </div>
+        <div class="action-grid">
+          <div class="action-list-card">
+            <h3>즉시 대응 이슈</h3>
+            <div class="issue-list" id="issueList"></div>
+          </div>
+          <div class="action-list-card">
+            <h3>콘텐츠 실행 제안</h3>
+            <div class="playbook-list" id="playbookList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel mentions-panel" id="mentions">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">Mention Feed</p>
+            <h2>채널별 멘션 수집</h2>
+          </div>
+          <p class="panel-caption">실시간 구조에서는 API 또는 크롤러 응답으로 교체 가능</p>
+        </div>
+        <div class="mentions-list" id="mentionsList"></div>
+      </section>
+
+      <section class="panel architecture-panel">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">Live Structure</p>
+            <h2>실시간 데이터 연동 구조</h2>
+          </div>
+          <p class="panel-caption">GitHub Pages는 화면 배포용이고 실시간 수집은 별도 API가 필요합니다</p>
+        </div>
+        <div class="architecture-grid">
+          <article class="architecture-card">
+            <strong>1. 수집</strong>
+            <p>네이버 DataLab, 구글 트렌드, 검색 API, 리뷰와 커뮤니티 크롤러에서 원천 데이터를 수집합니다.</p>
+          </article>
+          <article class="architecture-card">
+            <strong>2. 정규화</strong>
+            <p>브랜드명, 경쟁사명, 키워드, 감정 분류를 공통 포맷 JSON으로 정리합니다.</p>
+          </article>
+          <article class="architecture-card">
+            <strong>3. 제공</strong>
+            <p>`/api/dashboard?start=YYYY-MM-DD&end=YYYY-MM-DD` 형태로 프론트에 내려줍니다.</p>
+          </article>
+          <article class="architecture-card">
+            <strong>4. 액션</strong>
+            <p>부정 이슈 급증 시 알림, 콘텐츠 추천, 상세페이지 문구 교체까지 연결할 수 있습니다.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
