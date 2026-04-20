@@ -64,7 +64,7 @@ const questions = [
     category: "Redness Timer",
     title: "세안 후 붉은 기는 얼마나 오래 남나요?",
     description: "붉은 기가 가라앉는 시간을 골라 장벽 반응 속도를 확인해요.",
-    type: "segments",
+    type: "timeVisual",
     options: [
       { value: "under10", label: "10분 내외", description: "잠깐 붉어졌다가 비교적 빠르게 가라앉아요." },
       { value: "over30", label: "30분 이상", description: "붉은 기가 꽤 오래 남아 피부가 예민해 보여요." },
@@ -76,7 +76,7 @@ const questions = [
     category: "Lifestyle Rhythm",
     title: "요즘 수면 리듬은 어떤 편인가요?",
     description: "피부 회복력과 컨디션을 좌우하는 생활 리듬을 체크해요.",
-    type: "bubbles",
+    type: "sleepClock",
     options: [
       { value: "short", label: "6시간 미만", description: "피곤하고 피부가 푸석해 보이는 날이 많아요." },
       { value: "steady", label: "7~8시간", description: "수면 시간이 비교적 충분하고 일정한 편이에요." },
@@ -104,9 +104,11 @@ const questions = [
     description: "세안 방식은 장벽과 피지 밸런스에 직접 영향을 줍니다.",
     type: "segments",
     options: [
-      { value: "overCleanse", label: "뽀득할 때까지", description: "이중·삼중 세안처럼 강하게 씻는 편이에요." },
-      { value: "simpleCleanse", label: "가볍게 한 번", description: "클렌징 오일이나 폼 하나로 비교적 가볍게 마무리해요." },
-      { value: "dailyWipe", label: "닦토를 매일", description: "화장솜으로 닦아내는 토너 사용을 자주 해요." }
+      { value: "overCleanse", label: "뽀득할 때까지", description: "개운한 느낌이 날 때까지 오래 씻는 편이에요." },
+      { value: "gentleOnce", label: "천천히 자극없이 1번", description: "마찰을 줄이고 한 번에 부드럽게 세안해요." },
+      { value: "dailyWipe", label: "닦토를 자주", description: "화장솜으로 닦아내는 토너 사용을 자주 해요." },
+      { value: "warmWater", label: "따뜻한 물로", description: "미온수보다 따뜻한 물로 씻는 편이에요." },
+      { value: "showerStream", label: "샤워하며 샤워기로", description: "샤워 중 얼굴에 물줄기를 직접 닿게 해요." }
     ]
   },
   {
@@ -114,10 +116,13 @@ const questions = [
     category: "Recovery Signal",
     title: "자고 일어난 후 베개 자국은 얼마나 오래가나요?",
     description: "피부 회복력과 탄력 흐름을 확인하는 재미있는 체크예요.",
-    type: "segments",
+    type: "recoveryDrag",
+    defaultValue: "normal",
     options: [
-      { value: "quick", label: "10분 내 사라짐", description: "눌린 자국이 비교적 빠르게 회복돼요." },
-      { value: "slow", label: "30분 이상 지속", description: "눌린 자국이 오래 남아 회복력이 떨어진 느낌이 있어요." }
+      { value: "quick", label: "10분 내 사라짐", minutes: 10, description: "눌린 자국이 비교적 빠르게 회복돼요." },
+      { value: "normal", label: "20분 전후", minutes: 20, description: "조금 시간이 지나면 자연스럽게 옅어져요." },
+      { value: "slow", label: "30분 이상 지속", minutes: 35, description: "눌린 자국이 오래 남아 회복력이 떨어진 느낌이 있어요." },
+      { value: "verySlow", label: "오전 내내 남음", minutes: 60, description: "아침 시간이 지나도 자국이 쉽게 사라지지 않아요." }
     ]
   },
   {
@@ -215,6 +220,91 @@ const questions = [
 
 const STORAGE_KEY = "TROIAREUKE_SKIN_DIAGNOSIS_RECORDS";
 
+const productCatalog = {
+  "P.I.T 클렌징 밀크": { image: "assets/products/pit-cleansing-milk.jpg", category: "클렌저" },
+  "악센 오일컷 클렌징": { image: "assets/products/acsen-oilcut-cleansing.jpg", category: "클렌저" },
+  "악센 리커버리": { image: "assets/products/acsen-recovery.jpg", category: "크림" },
+  "악센 시카 SEN 토너": { image: "assets/products/acsen-cica-sen-toner.jpg", category: "토너" },
+  "악센 SEN 앰플": { image: "assets/products/acsen-sen-ampoule.jpg", category: "앰플" },
+  "악센 AC클리어 앰플": { image: "assets/products/acsen-ac-clear-ampoule-kit.jpg", category: "앰플" },
+  "악센 TOC토너": { image: "assets/products/acsen-toc-toner.jpg", category: "토너" },
+  "악센 AC크림": { image: "assets/products/acsen-ac-cream.jpg", category: "크림" },
+  "악센 AC스팟솔루션": { image: "assets/products/acsen-ac-spot-solution.jpg", category: "스팟" },
+  "악센 UV프로텍터 에센스": { image: "assets/products/acsen-uv-protector-essence.jpg", category: "선케어" },
+  "AGT™ 하이드로 에센스": { image: "assets/products/agt-hydro-essence.jpg", category: "에센스" },
+  "AGT™ 하이드로 크림": { image: "assets/products/agt-hydro-cream.jpg", category: "크림" },
+  "에너지 크림": { image: "assets/products/energy-cream.jpg", category: "크림" },
+  "쉴드크림": { image: "assets/products/shield-cream.jpg", category: "크림" },
+  "안티-링클 아이크림": { image: "assets/products/anti-wrinkle-eye-cream.jpg", category: "아이케어" },
+  "안티-링클 아이패치": { image: "assets/products/anti-wrinkle-eye-patch.jpg", category: "아이케어" },
+  "멜라소닉 C-인퓨저": { image: "assets/products/melasonic-c-infuser.jpg", category: "앰플" },
+  "인텐스 UV프로텍터 크림": { image: "assets/products/intense-uv-protector-cream.jpg", category: "선케어" },
+  "GPS 마스크 비타토닝": { image: "assets/products/gps-mask-vita-toning.jpg", category: "마스크" },
+  "GPS 마스크 티-레스큐": { image: "assets/products/gps-mask-t-rescue.jpg", category: "마스크" },
+  "GPS 마스크 레드 디-에이징": { image: "assets/products/gps-mask-red-deaging.jpg", category: "마스크" },
+  "H+ 칵테일 옐로우": { image: "assets/products/healing-cocktail-yellow.jpg", category: "앰플토너" },
+  "H+ 칵테일 그린": { image: "assets/products/healing-cocktail-green.jpg", category: "앰플토너" },
+  "H+ 칵테일 레드": { image: "assets/products/healing-cocktail-red.jpg", category: "앰플토너" },
+  "H+ 칵테일 블루": { image: "assets/products/healing-cocktail-blue.jpg", category: "앰플토너" }
+};
+
+const productSets = {
+  aging: {
+    title: "탄력/주름/노화 케어 세트",
+    type: "주름·탄력",
+    description: "탄력 저하와 주름 등 노화 징후를 집중 케어해 생기 있고 매끈한 피부로 설계한 세트입니다.",
+    products: ["H+ 칵테일 레드", "안티-링클 아이크림", "에너지 크림", "GPS 마스크 레드 디-에이징"]
+  },
+  pore: {
+    title: "모공 밀도 케어 세트",
+    type: "모공·결",
+    description: "피지 배출과 결 정돈, 수분 밀도 케어를 함께 잡아 느슨해진 모공 탄력을 관리합니다.",
+    products: ["악센 오일컷 클렌징", "악센 TOC토너", "H+ 칵테일 레드", "AGT™ 하이드로 에센스"]
+  },
+  barrier: {
+    title: "피부 장벽강화 세트",
+    type: "장벽·민감",
+    description: "약산성·저자극 루틴으로 민감하고 약해진 피부에 진정, 보습, 보호를 단계별로 채웁니다.",
+    products: ["악센 리커버리", "악센 시카 SEN 토너", "악센 SEN 앰플", "쉴드크림"]
+  },
+  pigment: {
+    title: "기미/잡티 케어 세트",
+    type: "색소·톤",
+    description: "멜라닌 완화, 브라이트닝, 자외선 차단을 연결해 칙칙한 피부톤을 균일하게 정리합니다.",
+    products: ["H+ 칵테일 옐로우", "멜라소닉 C-인퓨저", "인텐스 UV프로텍터 크림", "GPS 마스크 비타토닝"]
+  },
+  sebum: {
+    title: "피지조절 케어 세트",
+    type: "피지·번들거림",
+    description: "과도한 피지와 모공 정체를 정돈해 피부를 맑고 깨끗한 컨디션으로 맞춥니다.",
+    products: ["악센 오일컷 클렌징", "악센 AC클리어 앰플", "악센 AC크림"]
+  },
+  heat: {
+    title: "해열/열노화 케어 세트",
+    type: "열감·홍조",
+    description: "열감과 민감 반응을 빠르게 진정시키고 수분 장벽을 강화하는 쿨링 케어입니다.",
+    products: ["H+ 칵테일 블루", "AGT™ 하이드로 에센스", "AGT™ 하이드로 크림", "GPS 마스크 티-레스큐"]
+  },
+  hydration: {
+    title: "수분/진정 케어 세트",
+    type: "수분·진정",
+    description: "고보습 레이어링으로 건조함과 당김을 완화하고 장시간 촉촉함을 유지합니다.",
+    products: ["H+ 칵테일 그린", "AGT™ 하이드로 에센스", "AGT™ 하이드로 크림", "쉴드크림"]
+  },
+  redness: {
+    title: "홍조 케어 세트",
+    type: "홍조·민감",
+    description: "저자극 진정 루틴으로 붉은기와 민감 반응을 가라앉히고 장벽 회복을 돕습니다.",
+    products: ["악센 SEN 앰플", "악센 시카 SEN 토너", "악센 리커버리", "악센 UV프로텍터 에센스"]
+  },
+  acne: {
+    title: "여드름/트러블 케어 세트",
+    type: "트러블·모공",
+    description: "피지, 각질, 모공, 염증성 트러블을 함께 관리하는 지성·복합성 맞춤 세트입니다.",
+    products: ["악센 AC클리어 앰플", "악센 TOC토너", "악센 AC스팟솔루션", "악센 AC크림"]
+  }
+};
+
 const state = {
   currentIndex: 0,
   answers: {},
@@ -241,6 +331,9 @@ const resultScoreValue = document.getElementById("result-score-value");
 const resultHeadline = document.getElementById("result-headline");
 const resultSummary = document.getElementById("result-summary");
 const resultRecommendations = document.getElementById("result-recommendations");
+const productSetTitle = document.getElementById("product-set-title");
+const productSetDescription = document.getElementById("product-set-description");
+const productRecommendations = document.getElementById("product-recommendations");
 const restartButton = document.getElementById("restart-button");
 const consultButton = document.getElementById("consult-button");
 const consultModal = document.getElementById("consult-modal");
@@ -296,8 +389,27 @@ function getTimestampLabel(isoString) {
   }).format(date);
 }
 
+function ensureDefaultAnswer(question) {
+  if (state.answers[question.id] !== undefined) {
+    return;
+  }
+
+  if (question.type === "sebumVisual") {
+    state.answers[question.id] = question.defaultValue || "normal";
+  }
+
+  if (question.type === "slider") {
+    state.answers[question.id] = question.defaultValue ?? 4;
+  }
+
+  if (question.type === "recoveryDrag") {
+    state.answers[question.id] = question.defaultValue || question.options[1]?.value || question.options[0]?.value;
+  }
+}
+
 function renderQuestion() {
   const question = questions[state.currentIndex];
+  ensureDefaultAnswer(question);
   const progress = Math.round(((state.currentIndex + 1) / questions.length) * 100);
   const customerPrefix = getCustomerPrefix();
   const isFaceMap = question.type === "faceMap";
@@ -321,7 +433,7 @@ function renderQuestion() {
   prevButton.disabled = state.currentIndex === 0 && (!isFaceMap || state.faceZoneStep === 0);
   nextButton.textContent = isFaceMap
     ? (state.faceZoneStep === question.zones.length - 1 ? "다음" : "다음 부위")
-    : (state.currentIndex === questions.length - 1 ? "결과 보기" : "다음");
+    : (state.currentIndex === questions.length - 1 ? "추천 상품 받기" : "다음");
 
   dynamicField.innerHTML = "";
 
@@ -343,6 +455,18 @@ function renderQuestion() {
 
   if (question.type === "segments") {
     renderSegments(question);
+  }
+
+  if (question.type === "timeVisual") {
+    renderTimeVisual(question);
+  }
+
+  if (question.type === "sleepClock") {
+    renderSleepClock(question);
+  }
+
+  if (question.type === "recoveryDrag") {
+    renderRecoveryDrag(question);
   }
 
   if (question.type === "bubbles") {
@@ -710,6 +834,145 @@ function renderBubbles(question) {
   });
 
   dynamicField.appendChild(wrapper);
+}
+
+function renderTimeVisual(question) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "time-visual-grid";
+  const selectedValue = state.answers[question.id];
+  const progressMap = {
+    under10: 28,
+    over30: 64,
+    overnight: 96
+  };
+  const handMap = {
+    under10: 38,
+    over30: 150,
+    overnight: 300
+  };
+
+  question.options.forEach((option) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "time-card";
+    if (selectedValue === option.value) {
+      button.classList.add("is-selected");
+    }
+    const progress = progressMap[option.value] || 40;
+    const hand = handMap[option.value] || 90;
+    button.innerHTML = `
+      <span class="time-clock" style="--time-progress: ${progress}%; --hand-angle: ${hand}deg;">
+        <span class="time-clock-hand"></span>
+        <span class="time-clock-center"></span>
+      </span>
+      <span class="time-copy">
+        <strong>${option.label}</strong>
+        <span>${option.description}</span>
+      </span>
+    `;
+    button.addEventListener("click", () => {
+      state.answers[question.id] = option.value;
+      renderQuestion();
+    });
+    wrapper.appendChild(button);
+  });
+
+  dynamicField.appendChild(wrapper);
+}
+
+function renderSleepClock(question) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "sleep-clock-grid";
+  const selectedValue = state.answers[question.id];
+  const clockMap = {
+    short: { start: "02", end: "07", fill: 42 },
+    steady: { start: "23", end: "07", fill: 78 },
+    irregular: { start: "?", end: "?", fill: 58 }
+  };
+
+  question.options.forEach((option) => {
+    const clock = clockMap[option.value] || clockMap.steady;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "sleep-card";
+    if (selectedValue === option.value) {
+      button.classList.add("is-selected");
+    }
+    button.innerHTML = `
+      <span class="sleep-dial" style="--sleep-fill: ${clock.fill}%;">
+        <span class="sleep-time sleep-time-start">${clock.start}</span>
+        <span class="sleep-time sleep-time-end">${clock.end}</span>
+      </span>
+      <span class="sleep-copy">
+        <strong>${option.label}</strong>
+        <span>${option.description}</span>
+      </span>
+    `;
+    button.addEventListener("click", () => {
+      state.answers[question.id] = option.value;
+      renderQuestion();
+    });
+    wrapper.appendChild(button);
+  });
+
+  dynamicField.appendChild(wrapper);
+}
+
+function renderRecoveryDrag(question) {
+  const selectedValue = state.answers[question.id] || question.defaultValue || question.options[1].value;
+  const selectedIndex = Math.max(0, question.options.findIndex((option) => option.value === selectedValue));
+  const selectedOption = question.options[selectedIndex] || question.options[0];
+  const container = document.createElement("div");
+  container.className = "recovery-drag-panel";
+  container.innerHTML = `
+    <div class="pillow-visual" style="--mark-opacity: ${getPillowMarkOpacity(selectedIndex, question.options.length)};">
+      <span class="pillow-shape"></span>
+      <span class="pillow-mark"></span>
+      <span class="pillow-skin"></span>
+    </div>
+    <div class="recovery-meter-copy">
+      <span id="recovery-minutes" class="recovery-minutes">${selectedOption.minutes}분</span>
+      <strong id="recovery-label">${selectedOption.label}</strong>
+      <p id="recovery-description">${selectedOption.description}</p>
+    </div>
+    <input
+      id="recovery-slider"
+      class="recovery-slider"
+      type="range"
+      min="0"
+      max="${question.options.length - 1}"
+      step="1"
+      value="${selectedIndex}"
+    >
+    <div class="recovery-ticks">
+      ${question.options.map((option) => `<span>${option.label}</span>`).join("")}
+    </div>
+  `;
+
+  dynamicField.appendChild(container);
+
+  const slider = document.getElementById("recovery-slider");
+  const minutes = document.getElementById("recovery-minutes");
+  const label = document.getElementById("recovery-label");
+  const description = document.getElementById("recovery-description");
+  const visual = container.querySelector(".pillow-visual");
+
+  slider.addEventListener("input", (event) => {
+    const currentIndex = Number(event.target.value);
+    const currentOption = question.options[currentIndex];
+    state.answers[question.id] = currentOption.value;
+    minutes.textContent = `${currentOption.minutes}분`;
+    label.textContent = currentOption.label;
+    description.textContent = currentOption.description;
+    visual.style.setProperty("--mark-opacity", getPillowMarkOpacity(currentIndex, question.options.length));
+  });
+}
+
+function getPillowMarkOpacity(index, total) {
+  if (total <= 1) {
+    return 0.2;
+  }
+  return (0.18 + (index / (total - 1)) * 0.72).toFixed(2);
 }
 
 function renderPills(question) {
@@ -1155,6 +1418,10 @@ function buildConsultSummaryText() {
     questions.find((question) => question.id === "oilBalance"),
     state.answers.oilBalance
   );
+  const productSet = result.recommendedSet;
+  const productLine = productSet
+    ? `${productSet.title} - ${productSet.products.join(", ")}`
+    : "-";
 
   return [
     "[트로이아르케 피부 진단 요약]",
@@ -1166,6 +1433,7 @@ function buildConsultSummaryText() {
     `부위별 고민: ${zoneAnswer}`,
     `대표 고민: ${concernAnswer}`,
     `진단 요약: ${result.headline}`,
+    `추천 상품: ${productLine}`,
     `상담 메모: ${customer.note?.trim() || "없음"}`
   ].join("\n");
 }
@@ -1191,6 +1459,48 @@ async function copyConsultSummary() {
     document.execCommand("copy");
     consultCopyStatus.textContent = "상담 요약이 복사되었습니다.";
   }
+}
+
+function getRecommendedProductSet() {
+  const mainConcern = state.answers.representativeConcern;
+  const oil = state.answers.oilBalance;
+  const redness = state.answers.rednessDuration;
+  const sleep = state.answers.sleepRhythm;
+  const faceAnswers = state.answers.faceZoneConcern || {};
+  const faceConcernValues = Object.values(faceAnswers).map((item) => item?.concern || "");
+
+  if (mainConcern === "pigment" || mainConcern === "tone") {
+    return productSets.pigment;
+  }
+
+  if (mainConcern === "elasticity" || state.answers.recoverySignal === "verySlow") {
+    return productSets.aging;
+  }
+
+  if (mainConcern === "dehydration") {
+    return productSets.hydration;
+  }
+
+  if (mainConcern === "sensitive") {
+    return redness === "overnight" || redness === "over30" ? productSets.redness : productSets.barrier;
+  }
+
+  if (mainConcern === "pore") {
+    if (oil === "many" || faceConcernValues.some((value) => value.includes("trouble") || value.includes("blackhead"))) {
+      return productSets.acne;
+    }
+    return productSets.pore;
+  }
+
+  if (oil === "many") {
+    return productSets.sebum;
+  }
+
+  if (redness === "overnight" || sleep === "irregular") {
+    return productSets.heat;
+  }
+
+  return productSets.hydration;
 }
 
 function calculateResult() {
@@ -1251,7 +1561,8 @@ function calculateResult() {
     score,
     headline,
     summary,
-    recommendations
+    recommendations,
+    recommendedSet: getRecommendedProductSet()
   };
 }
 
@@ -1283,6 +1594,37 @@ function renderSummary() {
     const item = document.createElement("li");
     item.textContent = recommendation;
     resultRecommendations.appendChild(item);
+  });
+
+  renderProductRecommendations(result.recommendedSet);
+}
+
+function renderProductRecommendations(productSet) {
+  if (!productSet || !productRecommendations) {
+    return;
+  }
+
+  productSetTitle.textContent = productSet.title;
+  productSetDescription.textContent = productSet.description;
+  productRecommendations.innerHTML = "";
+
+  productSet.products.forEach((productName, index) => {
+    const product = productCatalog[productName];
+    if (!product) {
+      return;
+    }
+    const card = document.createElement("article");
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="product-image-wrap">
+        <img src="${product.image}" alt="${productName}" loading="lazy">
+      </div>
+      <div class="product-card-copy">
+        <span>Step ${index + 1} · ${product.category}</span>
+        <strong>${productName}</strong>
+      </div>
+    `;
+    productRecommendations.appendChild(card);
   });
 }
 
