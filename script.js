@@ -10,9 +10,10 @@ const questions = [
     id: "postCleanseFeel",
     category: "After Cleansing",
     title: "세안 후 피부 느낌은 어떤가요?",
-    description: "세안 직후 가장 가까운 반응을 선택해 주세요.",
+    description: "가장 가까운 반응 순으로 눌러주세요. 더 가까울수록 먼저 눌러주세요.",
     type: "cards",
     multiSelect: true,
+    orderedSelect: true,
     options: [
       { value: "tight", label: "많이 당김", description: "세안 후 바로 당기고 건조한 느낌이 강해요." },
       { value: "innerDry", label: "속건조", description: "겉은 괜찮아 보여도 속이 메마른 느낌이 있어요." },
@@ -42,6 +43,82 @@ const questions = [
     max: 10,
     step: 1,
     labels: ["안정적", "보통", "약간 예민", "매우 예민"]
+  },
+  {
+    id: "reactionTriggers",
+    category: "Barrier Triggers",
+    title: "피부가 반응하는 상황을 가까운 순서대로 골라주세요.",
+    description: "자주 겪는 상황부터 눌러 주세요. 선택 순서가 장벽 민감도 판단에 반영됩니다.",
+    type: "cards",
+    multiSelect: true,
+    orderedSelect: true,
+    options: [
+      { value: "season", visual: "환절기", label: "환절기마다 뒤집어져요", description: "계절이 바뀔 때 각질이 들뜨고 피부 컨디션이 쉽게 무너져요." },
+      { value: "cosmetics", visual: "화장품", label: "새 제품에 따갑거나 가려워요", description: "새 화장품을 쓰면 따가움, 가려움, 붉어짐이 생겨요." },
+      { value: "dust", visual: "미세먼지", label: "공기 나쁜 날 트러블이 올라와요", description: "미세먼지나 외부 환경이 나쁠 때 간지럽고 트러블이 올라와요." },
+      { value: "stable", visual: "무던함", label: "대체로 무던한 편이에요", description: "환경이 바뀌어도 피부 반응이 크게 심해지지 않아요." }
+    ]
+  },
+  {
+    id: "rednessDuration",
+    category: "Redness Timer",
+    title: "세안 후 붉은 기는 얼마나 오래 남나요?",
+    description: "붉은 기가 가라앉는 시간을 골라 장벽 반응 속도를 확인해요.",
+    type: "segments",
+    options: [
+      { value: "under10", label: "10분 내외", description: "잠깐 붉어졌다가 비교적 빠르게 가라앉아요." },
+      { value: "over30", label: "30분 이상", description: "붉은 기가 꽤 오래 남아 피부가 예민해 보여요." },
+      { value: "overnight", label: "다음날까지", description: "붉은 기나 열감이 다음날까지 이어질 때가 있어요." }
+    ]
+  },
+  {
+    id: "sleepRhythm",
+    category: "Lifestyle Rhythm",
+    title: "요즘 수면 리듬은 어떤 편인가요?",
+    description: "피부 회복력과 컨디션을 좌우하는 생활 리듬을 체크해요.",
+    type: "bubbles",
+    options: [
+      { value: "short", label: "6시간 미만", description: "피곤하고 피부가 푸석해 보이는 날이 많아요." },
+      { value: "steady", label: "7~8시간", description: "수면 시간이 비교적 충분하고 일정한 편이에요." },
+      { value: "irregular", label: "불규칙", description: "자는 시간이 들쭉날쭉하고 자주 깨는 편이에요." }
+    ]
+  },
+  {
+    id: "dailyTriggers",
+    category: "Daily Trigger Cards",
+    title: "생활 속 피부 트리거를 골라주세요.",
+    description: "피부를 흔들 수 있는 생활 요인을 여러 개 선택해 주세요.",
+    type: "cards",
+    multiSelect: true,
+    options: [
+      { value: "spicyLateMeal", visual: "식습관", label: "맵고 짠 음식 / 야식", description: "자극적인 음식이나 늦은 식사가 피부 컨디션에 영향을 주는 편이에요." },
+      { value: "sweetFlour", visual: "당·밀가루", label: "단 음식 / 밀가루", description: "단 음식이나 밀가루를 먹은 뒤 트러블이 신경 쓰일 때가 있어요." },
+      { value: "stressHeat", visual: "스트레스", label: "스트레스와 열감", description: "스트레스가 높아지면 열감, 붉어짐, 트러블이 함께 올라와요." },
+      { value: "waterVeggie", visual: "밸런스", label: "수분과 채소를 챙겨요", description: "수분 섭취와 식단 균형을 비교적 잘 챙기는 편이에요." }
+    ]
+  },
+  {
+    id: "cleansingHabit",
+    category: "Home Care Check",
+    title: "평소 세안 습관은 어떤 쪽에 가까운가요?",
+    description: "세안 방식은 장벽과 피지 밸런스에 직접 영향을 줍니다.",
+    type: "segments",
+    options: [
+      { value: "overCleanse", label: "뽀득할 때까지", description: "이중·삼중 세안처럼 강하게 씻는 편이에요." },
+      { value: "simpleCleanse", label: "가볍게 한 번", description: "클렌징 오일이나 폼 하나로 비교적 가볍게 마무리해요." },
+      { value: "dailyWipe", label: "닦토를 매일", description: "화장솜으로 닦아내는 토너 사용을 자주 해요." }
+    ]
+  },
+  {
+    id: "recoverySignal",
+    category: "Recovery Signal",
+    title: "자고 일어난 후 베개 자국은 얼마나 오래가나요?",
+    description: "피부 회복력과 탄력 흐름을 확인하는 재미있는 체크예요.",
+    type: "segments",
+    options: [
+      { value: "quick", label: "10분 내 사라짐", description: "눌린 자국이 비교적 빠르게 회복돼요." },
+      { value: "slow", label: "30분 이상 지속", description: "눌린 자국이 오래 남아 회복력이 떨어진 느낌이 있어요." }
+    ]
   },
   {
     id: "faceZoneConcern",
@@ -511,8 +588,13 @@ function renderCardOptions(question) {
     if (isSelected) {
       button.classList.add("is-selected");
     }
+    const selectedOrder = question.multiSelect ? selectedValues.indexOf(option.value) + 1 : 0;
     button.innerHTML = `
-      <span class="option-label">${option.label}</span>
+      <span class="option-topline">
+        ${option.visual ? `<span class="option-visual">${option.visual}</span>` : ""}
+        <span class="option-label">${option.label}</span>
+        ${question.orderedSelect && isSelected ? `<span class="option-order">${selectedOrder}</span>` : ""}
+      </span>
       <span class="option-description">${option.description}</span>
     `;
     button.addEventListener("click", () => {
@@ -1114,13 +1196,40 @@ async function copyConsultSummary() {
 function calculateResult() {
   const profile = getEstimatedSkinProfile();
   const sensitivity = Number(state.answers.sensitivityLevel || 0);
-  const score = Math.min(100, Math.max(22, 38 + sensitivity * 4 + (state.answers.oilBalance === "many" ? 14 : 0) + (state.answers.postCleanseFeel === "redness" ? 10 : 0)));
+  const cleanse = Array.isArray(state.answers.postCleanseFeel) ? state.answers.postCleanseFeel : [];
+  const reactionTriggers = Array.isArray(state.answers.reactionTriggers) ? state.answers.reactionTriggers : [];
+  const dailyTriggers = Array.isArray(state.answers.dailyTriggers) ? state.answers.dailyTriggers : [];
+  const rednessBoost = state.answers.rednessDuration === "overnight"
+    ? 12
+    : state.answers.rednessDuration === "over30"
+      ? 7
+      : 0;
+  const recoveryBoost = state.answers.recoverySignal === "slow" ? 5 : 0;
+  const lifestyleBoost = dailyTriggers.includes("stressHeat") ? 5 : Math.min(dailyTriggers.length * 2, 6);
+  const score = Math.min(
+    100,
+    Math.max(
+      22,
+      38
+        + sensitivity * 4
+        + (state.answers.oilBalance === "many" ? 14 : 0)
+        + (cleanse.includes("redness") ? 10 : 0)
+        + reactionTriggers.length * 3
+        + rednessBoost
+        + recoveryBoost
+        + lifestyleBoost
+    )
+  );
+  const representativeQuestion = questions.find((question) => question.id === "representativeConcern");
+  const faceZoneQuestion = questions.find((question) => question.id === "faceZoneConcern");
+  const representativeLabel = getOptionLabel(representativeQuestion, state.answers.representativeConcern);
+  const faceZoneLabel = getOptionLabel(faceZoneQuestion, state.answers.faceZoneConcern);
 
   let headline = `${profile.typeLabel} 중심 상담이 적합한 상태`;
-  let summary = `${profile.description} 현재 대표 고민은 ${getOptionLabel(questions[6], state.answers.representativeConcern)} 중심으로 보입니다.`;
+  let summary = `${profile.description} 현재 대표 고민은 ${representativeLabel} 중심으로 보입니다.`;
   let recommendations = [
     `${profile.typeLabel} 기준의 홈케어와 상담 메시지를 먼저 제안해 보세요.`,
-    `부위 선택 결과인 ${getOptionLabel(questions[4], state.answers.faceZoneConcern)} 부위를 중심으로 제품 설명을 연결하면 자연스럽습니다.`,
+    `부위 선택 결과인 ${faceZoneLabel} 부위를 중심으로 제품 설명을 연결하면 자연스럽습니다.`,
     "고객 배포용에서는 이 결과를 제품 추천 또는 상담 예약 CTA와 바로 이어주는 구성이 좋습니다."
   ];
 
