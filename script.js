@@ -841,14 +841,19 @@ function renderTimeVisual(question) {
   wrapper.className = "time-visual-grid";
   const selectedValue = state.answers[question.id];
   const progressMap = {
-    under10: 28,
-    over30: 64,
-    overnight: 96
+    under10: 18,
+    over30: 54,
+    overnight: 100
   };
   const handMap = {
     under10: 38,
-    over30: 150,
-    overnight: 300
+    over30: 180,
+    overnight: 0
+  };
+  const labelMap = {
+    under10: "10분",
+    over30: "30분+",
+    overnight: "24h 이상"
   };
 
   question.options.forEach((option) => {
@@ -860,10 +865,13 @@ function renderTimeVisual(question) {
     }
     const progress = progressMap[option.value] || 40;
     const hand = handMap[option.value] || 90;
+    const timeLabel = labelMap[option.value] || option.label;
+    const isOvernight = option.value === "overnight";
     button.innerHTML = `
-      <span class="time-clock" style="--time-progress: ${progress}%; --hand-angle: ${hand}deg;">
-        <span class="time-clock-hand"></span>
+      <span class="time-clock ${isOvernight ? "is-overnight" : ""}" style="--time-progress: ${progress}%; --hand-angle: ${hand}deg;">
+        ${isOvernight ? "" : "<span class=\"time-clock-hand\"></span>"}
         <span class="time-clock-center"></span>
+        <span class="time-clock-label">${timeLabel}</span>
       </span>
       <span class="time-copy">
         <strong>${option.label}</strong>
@@ -884,14 +892,14 @@ function renderSleepClock(question) {
   const wrapper = document.createElement("div");
   wrapper.className = "sleep-clock-grid";
   const selectedValue = state.answers[question.id];
-  const clockMap = {
-    short: { start: "02", end: "07", fill: 42 },
-    steady: { start: "23", end: "07", fill: 78 },
-    irregular: { start: "?", end: "?", fill: 58 }
+  const moonMap = {
+    short: { phase: "thin", label: "짧은 밤", fill: 38 },
+    steady: { phase: "full", label: "충분한 밤", fill: 82 },
+    irregular: { phase: "cloud", label: "흐린 밤", fill: 58 }
   };
 
   question.options.forEach((option) => {
-    const clock = clockMap[option.value] || clockMap.steady;
+    const moon = moonMap[option.value] || moonMap.steady;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "sleep-card";
@@ -899,9 +907,11 @@ function renderSleepClock(question) {
       button.classList.add("is-selected");
     }
     button.innerHTML = `
-      <span class="sleep-dial" style="--sleep-fill: ${clock.fill}%;">
-        <span class="sleep-time sleep-time-start">${clock.start}</span>
-        <span class="sleep-time sleep-time-end">${clock.end}</span>
+      <span class="sleep-dial sleep-moon sleep-moon-${moon.phase}" style="--sleep-fill: ${moon.fill}%;">
+        <span class="moon-core"></span>
+        <span class="moon-shadow"></span>
+        <span class="moon-cloud"></span>
+        <span class="sleep-moon-label">${moon.label}</span>
       </span>
       <span class="sleep-copy">
         <strong>${option.label}</strong>
